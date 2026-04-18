@@ -154,15 +154,6 @@ http://localhost:8080/swagger-ui.html
 
 ---
 
-## 🔮 Future Improvements
-
-* Add circuit breaker (Resilience4j)
-* Introduce integration tests with WireMock
-* Add CI/CD pipeline (GitHub Actions)
-* Deploy to cloud (Railway / Render)
-* Add request tracing and structured logging
-
----
 
 ## 👩‍💻 Author
 
