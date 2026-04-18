@@ -73,7 +73,7 @@ class BandControllerTest {
 
             @Test
             void Then_should_return_the_band_details_with_200_ok() throws Exception {
-                mockMvc.perform(get("/api/v1/bands/Nirvana"))
+                mockMvc.perform(get("/api/v1/bands/by-name/Nirvana"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.id").value("1"))
                         .andExpect(jsonPath("$.name").value("Nirvana"))

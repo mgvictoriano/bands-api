@@ -64,7 +64,7 @@ public class BandController {
             @ApiResponse(responseCode = "404", description = "Band not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @GetMapping("/{name}")
+    @GetMapping("/by-name/{name}")
     public BandResponse getByName(
             @Parameter(description = "Exact band name", example = "Nickelback")
             @PathVariable @NotBlank String name) {

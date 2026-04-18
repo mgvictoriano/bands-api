@@ -14,9 +14,5 @@ public record BandCatalogClientProperties(
         @NotNull Duration connectTimeout,
         @NotNull Duration readTimeout
 ) {
-    public BandCatalogClientProperties {
-        if (connectTimeout == null) connectTimeout = Duration.ofSeconds(2);
-        if (readTimeout == null) readTimeout = Duration.ofSeconds(3);
-    }
 }
 
