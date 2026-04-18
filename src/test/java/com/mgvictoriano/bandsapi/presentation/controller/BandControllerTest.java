@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.NoSuchElementException;
 import com.mgvictoriano.bandsapi.application.service.BandService;
 import com.mgvictoriano.bandsapi.domain.model.Band;
 import org.junit.jupiter.api.Test;
@@ -31,5 +32,15 @@ class BandControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Nirvana"))
                 .andExpect(jsonPath("$.genre").value("Grunge"));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenBandDoesNotExist() throws Exception {
+        when(bandService.getBandById(99L)).thenThrow(new NoSuchElementException("Band not found with id: 99"));
+
+        mockMvc.perform(get("/api/v1/bands/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Band not found with id: 99"));
     }
 }
