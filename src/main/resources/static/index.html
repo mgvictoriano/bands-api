@@ -452,8 +452,7 @@
 </div>
 
 <script>
-  const BASE = '';          // same origin (nginx proxies labs.mgaia.tech → this app)
-  const API  = `${BASE}/api/v1/bands`;
+  const API_CANDIDATES = buildApiCandidates();
 
   let allBands   = [];
   let activeGenre = 'All';
@@ -463,9 +462,7 @@
   // ── Fetch ──────────────────────────────────────────────────
   async function loadBands() {
     try {
-      const res = await fetch(API);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      allBands = await res.json();
+      allBands = await fetchBands();
       buildGenreFilter();
       renderDirectory();
       render();
@@ -481,6 +478,42 @@
       `;
       document.getElementById('directory-count').textContent = '0 bands';
     }
+  }
+
+  async function fetchBands() {
+    let lastError = null;
+
+    for (const url of API_CANDIDATES) {
+      try {
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!res.ok) {
+          lastError = new Error(`HTTP ${res.status} from ${url}`);
+          continue;
+        }
+
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          return data;
+        }
+
+        lastError = new Error(`Unexpected payload from ${url}`);
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error('No API endpoint responded');
+  }
+
+  function buildApiCandidates() {
+    const basePath = window.location.pathname.startsWith('/bands-api') ? '/bands-api' : '';
+    const ordered = [
+      `${basePath}/api/v1/bands`,
+      '/bands-api/api/v1/bands',
+      '/api/v1/bands'
+    ];
+
+    return [...new Set(ordered)];
   }
 
   // ── All bands directory ───────────────────────────────────
