@@ -1,2 +1,3 @@
 # bands-api
-Java Spring Boot backend challenge -  recruitment process
+
+Java Spring Boot backend challenge - recruitment process.
