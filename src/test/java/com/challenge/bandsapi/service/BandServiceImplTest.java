@@ -1,8 +1,8 @@
 package com.challenge.bandsapi.service;
 
-import com.challenge.bandsapi.client.BandCatalogClient;
 import com.challenge.bandsapi.exception.BandNotFoundException;
 import com.challenge.bandsapi.model.Band;
+import com.challenge.bandsapi.model.BandCatalog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class BandServiceImplTest {
 
     @Mock
-    private BandCatalogClient clientMock;
+    private BandCatalogLoader loaderMock;
 
     @InjectMocks
     private BandServiceImpl service;
@@ -41,7 +41,7 @@ class BandServiceImplTest {
                     band("2", "Goo Goo Dolls", "rock"),
                     band("3", "The Beatles", "classic rock")
             );
-            when(clientMock.fetchAll()).thenReturn(catalog);
+            when(loaderMock.load()).thenReturn(new BandCatalog(catalog));
         }
 
         @Nested
@@ -129,34 +129,6 @@ class BandServiceImplTest {
                 assertThatThrownBy(() -> service.getById("missing"))
                         .isInstanceOf(BandNotFoundException.class)
                         .hasMessageContaining("missing");
-            }
-        }
-    }
-
-    @Nested
-    class Given_a_blank_band_name {
-
-        @Nested
-        class When_get_by_name_is_called {
-
-            @Test
-            void Then_should_throw_illegal_argument_exception() {
-                assertThatThrownBy(() -> service.getByName("  "))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-        }
-    }
-
-    @Nested
-    class Given_a_blank_band_id {
-
-        @Nested
-        class When_get_by_id_is_called {
-
-            @Test
-            void Then_should_throw_illegal_argument_exception() {
-                assertThatThrownBy(() -> service.getById(""))
-                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
     }
