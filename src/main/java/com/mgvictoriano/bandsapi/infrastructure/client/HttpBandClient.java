@@ -4,7 +4,9 @@ import com.mgvictoriano.bandsapi.domain.model.Band;
 import com.mgvictoriano.bandsapi.domain.port.out.BandClient;
 import java.util.NoSuchElementException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 @Component
 public class HttpBandClient implements BandClient {
@@ -17,10 +19,17 @@ public class HttpBandClient implements BandClient {
 
     @Override
     public Band findById(Long id) {
-        Band band = restClient.get()
-                .uri("/bands/{id}", id)
-                .retrieve()
-                .body(Band.class);
+        Band band;
+        try {
+            band = restClient.get()
+                    .uri("/bands/{id}", id)
+                    .retrieve()
+                    .body(Band.class);
+        } catch (HttpClientErrorException.NotFound ex) {
+            throw new NoSuchElementException("Band not found with id: " + id);
+        } catch (RestClientResponseException ex) {
+            throw new IllegalStateException("External bands API request failed with status: " + ex.getStatusCode(), ex);
+        }
 
         if (band == null) {
             throw new NoSuchElementException("Band not found with id: " + id);
