@@ -20,6 +20,7 @@ REST API built with **Java 21** and **Spring Boot 3.3** that exposes a read-only
 - [Testing](#testing)
 - [Observability](#observability)
 - [Web UI](#web-ui)
+- [API documentation](#api-documentation)
 - [Project layout](#project-layout)
 
 ---
@@ -33,7 +34,7 @@ REST API built with **Java 21** and **Spring Boot 3.3** that exposes a read-only
 - Configurable HTTP client (base URL, connect/read timeouts) via `@ConfigurationProperties`.
 - OpenAPI 3 spec + Swagger UI out of the box.
 - Spring Boot Actuator for health, metrics and cache introspection.
-- Lightweight static HTML page served at `/` that consumes the API and shows the bands catalog.
+- Lightweight static HTML page served at the context root that consumes the API and shows the bands catalog.
 - Multi-stage Docker build and Compose file for reproducible deployments.
 - Unit and web-layer tests written in BDD style (Given / When / Then with nested classes).
 
@@ -250,8 +251,12 @@ Features: band grid, quick text filter, detail view. The page auto-detects wheth
 
 ## API documentation
 
-- OpenAPI JSON: `GET /bands-api/v3/api-docs`
-- Swagger UI:   `GET /bands-api/swagger-ui.html`
+The API is documented with OpenAPI 3 (springdoc-openapi) and ships with an embedded Swagger UI.
+
+| Resource    | Local                                                     | Production                                                  |
+| ----------- | --------------------------------------------------------- | ----------------------------------------------------------- |
+| Swagger UI  | http://localhost:8080/bands-api/swagger-ui.html           | https://labs.mgaia.tech/bands-api/swagger-ui.html           |
+| OpenAPI JSON| http://localhost:8080/bands-api/v3/api-docs               | https://labs.mgaia.tech/bands-api/v3/api-docs               |
 
 ---
 
