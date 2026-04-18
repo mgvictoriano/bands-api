@@ -66,7 +66,7 @@ https://bands-api.vercel.app/api/bands
 | ------ | -------------------------------- | ---------------------------- |
 | GET    | /api/v1/bands                    | List all bands               |
 | GET    | /api/v1/bands/id/{id}            | Get band by ID               |
-| GET    | /api/v1/bands/{name}             | Get band by exact name       |
+| GET    | /api/v1/bands/by-name/{name}     | Get band by exact name       |
 | GET    | /api/v1/bands/search?name={term} | Search bands by partial name |
 
 ---
@@ -126,6 +126,15 @@ curl http://localhost:8080/api/v1/bands
 
 ---
 
+## 🌐 Production Access
+
+Main entry points in production:
+
+* Frontend catalog: https://labs.mgaia.tech/bands-api/
+* Swagger UI: https://labs.mgaia.tech/bands-api/swagger-ui/index.html
+
+---
+
 ## 🧪 Running Tests
 
 ```bash
@@ -149,7 +158,7 @@ Spring Boot Actuator endpoints available:
 Swagger UI available at:
 
 ```
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
 ---
