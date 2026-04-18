@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bands Catalog</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d0f;
+      --surface:   #17171c;
+      --card:      #1e1e26;
+      --border:    #2a2a38;
+      --accent:    #7c6fef;
+      --accent2:   #b06ef3;
+      --text:      #e8e8f0;
+      --muted:     #7a7a96;
+      --radius:    14px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1430 0%, #0d1a2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+    }
+    header .logo {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    header p {
+      color: var(--muted);
+      margin-top: 0.4rem;
+      font-size: 0.95rem;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      vertical-align: middle;
+      margin-left: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Search bar ── */
+    .search-bar {
+      max-width: 560px;
+      margin: 2rem auto 0;
+      position: relative;
+    }
+    .search-bar input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.75rem 1rem 0.75rem 3rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input::placeholder { color: var(--muted); }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+    }
+
+    /* ── Stats bar ── */
+    .stats {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+    .stats span { color: var(--accent); font-weight: 600; }
+
+    /* ── Toolbar (genre filter) ── */
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 1.25rem 2rem 0;
+    }
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chip:hover, .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Grid ── */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 32px rgba(124, 111, 239, 0.18);
+    }
+    .card-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: var(--border);
+    }
+    .card-img-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #1e1e38, #2a2a4a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    .card-body {
+      padding: 1rem 1.1rem 1.2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .card-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-genre {
+      font-size: 0.78rem;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 600;
+    }
+    .card-plays {
+      margin-top: auto;
+      padding-top: 0.6rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ── Empty / loading / error ── */
+    .state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 5rem 1rem;
+      color: var(--muted);
+    }
+    .state .icon { font-size: 3rem; margin-bottom: 1rem; }
+    .state h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Modal ── */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .modal-header {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .modal-close {
+      margin-left: auto;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.3rem 0.6rem;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.15s;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-img {
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+    }
+    .modal-img-placeholder {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #1e1e38, #2a2a4a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+    }
+    .modal-body {
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .modal-title { font-size: 1.5rem; font-weight: 800; }
+    .modal-genre {
+      font-size: 0.8rem;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+    }
+    .modal-bio {
+      font-size: 0.9rem;
+      color: #b0b0c8;
+      line-height: 1.65;
+    }
+    .modal-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .meta-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-value { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      header { padding: 2rem 1rem 1.5rem; }
+      header .logo { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎸 Bands Catalog <span class="badge">API</span></div>
+  <p>Explore music bands powered by a Spring Boot REST API</p>
+  <div class="search-bar">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1 0 6.5 6.5a7.5 7.5 0 0 0 10.6 10.6z"/>
+    </svg>
+    <input type="text" id="search" placeholder="Search bands by name…" autocomplete="off" />
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="toolbar" id="genres"></div>
+
+<main>
+  <div class="grid" id="grid">
+    <div class="state">
+      <div class="spinner"></div>
+      <h3>Loading bands…</h3>
+    </div>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <strong id="modal-name" style="font-size:1.05rem"></strong>
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    </div>
+    <div id="modal-img-wrap"></div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-genre" id="modal-genre"></div>
+      </div>
+      <div class="modal-meta" id="modal-meta"></div>
+      <p class="modal-bio" id="modal-bio"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const BASE = '';          // same origin (nginx proxies labs.mgaia.tech → this app)
+  const API  = `${BASE}/api/v1/bands`;
+
+  let allBands   = [];
+  let activeGenre = 'All';
+  let searchTerm  = '';
+
+  // ── Fetch ──────────────────────────────────────────────────
+  async function loadBands() {
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      allBands = await res.json();
+      buildGenreFilter();
+      render();
+    } catch (err) {
+      document.getElementById('grid').innerHTML = `
+        <div class="state">
+          <div class="icon">⚠️</div>
+          <h3>Could not load bands</h3>
+          <p>${err.message}</p>
+        </div>`;
+    }
+  }
+
+  // ── Genre filter ────────────────────────────────────────────
+  function buildGenreFilter() {
+    const genres = ['All', ...new Set(
+      allBands.map(b => b.genre).filter(Boolean).sort()
+    )];
+    const container = document.getElementById('genres');
+    container.innerHTML = genres.map(g => `
+      <span class="chip${g === activeGenre ? ' active' : ''}" data-genre="${g}">${g}</span>
+    `).join('');
+    container.querySelectorAll('.chip').forEach(chip =>
+      chip.addEventListener('click', () => {
+        activeGenre = chip.dataset.genre;
+        container.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
+        render();
+      })
+    );
+  }
+
+  // ── Filter logic ────────────────────────────────────────────
+  function filtered() {
+    return allBands.filter(b => {
+      const matchGenre = activeGenre === 'All' || b.genre === activeGenre;
+      const matchSearch = !searchTerm ||
+        b.name?.toLowerCase().includes(searchTerm) ||
+        b.genre?.toLowerCase().includes(searchTerm);
+      return matchGenre && matchSearch;
+    });
+  }
+
+  // ── Render grid ─────────────────────────────────────────────
+  function render() {
+    const list = filtered();
+    const stats = document.getElementById('stats');
+    stats.innerHTML = `Showing <span>${list.length}</span> of <span>${allBands.length}</span> bands`;
+
+    const grid = document.getElementById('grid');
+    if (!list.length) {
+      grid.innerHTML = `
+        <div class="state">
+          <div class="icon">🔍</div>
+          <h3>No bands found</h3>
+          <p>Try a different search term or genre</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map(b => `
+      <div class="card" data-id="${b.id}" tabindex="0" role="button" aria-label="${b.name}">
+        ${b.image
+          ? `<img class="card-img" src="${b.image}" alt="${b.name}" loading="lazy" onerror="this.replaceWith(placeholder())">`
+          : `<div class="card-img-placeholder">🎵</div>`
+        }
+        <div class="card-body">
+          <div class="card-genre">${b.genre || '—'}</div>
+          <div class="card-name">${b.name}</div>
+          <div class="card-plays">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            ${formatNum(b.numPlays)} plays
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.card').forEach(card => {
+      const open = () => openModal(card.dataset.id);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', e => e.key === 'Enter' && open());
+    });
+  }
+
+  // ── Modal ────────────────────────────────────────────────────
+  function openModal(id) {
+    const b = allBands.find(x => x.id === id);
+    if (!b) return;
+
+    document.getElementById('modal-name').textContent  = b.name;
+    document.getElementById('modal-title').textContent = b.name;
+    document.getElementById('modal-genre').textContent = b.genre || '';
+    document.getElementById('modal-bio').textContent   = b.biography || 'No biography available.';
+    document.getElementById('modal-meta').innerHTML    = `
+      <div class="meta-item">
+        <span class="meta-label">Plays</span>
+        <span class="meta-value">${formatNum(b.numPlays)}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Genre</span>
+        <span class="meta-value">${b.genre || '—'}</span>
+      </div>
+    `;
+
+    const imgWrap = document.getElementById('modal-img-wrap');
+    imgWrap.innerHTML = b.image
+      ? `<img class="modal-img" src="${b.image}" alt="${b.name}" />`
+      : `<div class="modal-img-placeholder">🎵</div>`;
+
+    document.getElementById('overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay')) closeModal();
+  });
+  document.addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+  // ── Search ──────────────────────────────────────────────────
+  let debounce;
+  document.getElementById('search').addEventListener('input', e => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      searchTerm = e.target.value.trim().toLowerCase();
+      render();
+    }, 250);
+  });
+
+  // ── Helpers ─────────────────────────────────────────────────
+  function formatNum(n) {
+    if (!n) return '0';
+    return Number(n).toLocaleString('en-US');
+  }
+
+  function placeholder() {
+    const el = document.createElement('div');
+    el.className = 'card-img-placeholder';
+    el.textContent = '🎵';
+    return el;
+  }
+
+  // ── Init ─────────────────────────────────────────────────────
+  loadBands();
+</script>
+</body>
+</html>
