@@ -16,8 +16,7 @@ public class BandResponseMapper {
                 band.image(),
                 band.genre(),
                 band.biography(),
-                band.numPlays(),
-                band.albums()
+                band.numPlays()
         );
     }
 }
