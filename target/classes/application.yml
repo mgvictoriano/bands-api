@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: bands-api
+
+clients:
+  band-catalog:
+    base-url: https://bands-api.vercel.app
+    connect-timeout: 2s
+    read-timeout: 3s
+
+cache:
+  bands:
+    ttl: 10m
+    maximum-size: 500
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, caches
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: bands-api
+    description: Backend challenge REST API that exposes a music bands catalog with caching support.
+    version: 1.0.0
+
