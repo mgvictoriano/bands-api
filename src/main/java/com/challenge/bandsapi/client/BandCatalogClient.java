@@ -7,7 +7,6 @@ import com.challenge.bandsapi.model.Band;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
@@ -43,9 +42,6 @@ public class BandCatalogClient {
 
             log.info("Fetched {} bands from external catalog", bands.size());
             return bands;
-        } catch (HttpClientErrorException.NotFound ex) {
-            log.warn("Bands endpoint not found: {}", ex.getMessage());
-            return List.of();
         } catch (RestClientException ex) {
             log.error("Failed to fetch bands from external catalog", ex);
             throw new ExternalServiceException("Band catalog client request failed", ex);
