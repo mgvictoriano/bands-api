@@ -2,8 +2,8 @@ package com.challenge.bandsapi.service;
 
 import com.challenge.bandsapi.client.BandCatalogClient;
 import com.challenge.bandsapi.model.BandCatalog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -13,16 +13,12 @@ import org.springframework.stereotype.Component;
  * that {@link org.springframework.cache.annotation.Cacheable} is
  * applied through the proxy (avoiding self-invocation pitfalls).
  */
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class BandCatalogLoader {
 
-    private static final Logger log = LoggerFactory.getLogger(BandCatalogLoader.class);
-
     private final BandCatalogClient client;
-
-    public BandCatalogLoader(BandCatalogClient client) {
-        this.client = client;
-    }
 
     @Cacheable(cacheNames = "bandsCatalog")
     public BandCatalog load() {
