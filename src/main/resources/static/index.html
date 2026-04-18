@@ -124,6 +124,86 @@
       color: #fff;
     }
 
+    /* ── All bands directory ── */
+    .directory {
+      max-width: 1280px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+    }
+    .directory-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .directory-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .directory-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .directory-count {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .directory-input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 0.85rem;
+      color: var(--text);
+      outline: none;
+      font-size: 0.88rem;
+      margin-bottom: 0.75rem;
+    }
+    .directory-input:focus { border-color: var(--accent); }
+    .directory-input::placeholder { color: var(--muted); }
+    .directory-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.45rem;
+      max-height: 210px;
+      overflow-y: auto;
+      padding-right: 0.2rem;
+    }
+    .directory-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 0.6rem;
+      color: #cfd0df;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .directory-item:hover,
+    .directory-item:focus {
+      outline: none;
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .directory-empty {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 0.8rem;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+    }
+
     /* ── Grid ── */
     main {
       max-width: 1280px;
@@ -326,6 +406,23 @@
 
 <div class="toolbar" id="genres"></div>
 
+<section class="directory" aria-label="All bands directory">
+  <div class="directory-panel">
+    <div class="directory-header">
+      <div class="directory-title">All Bands Directory</div>
+      <div class="directory-count" id="directory-count"></div>
+    </div>
+    <input
+      id="all-bands-filter"
+      class="directory-input"
+      type="text"
+      placeholder="Filter all bands by name..."
+      autocomplete="off"
+    />
+    <div class="directory-list" id="directory-list"></div>
+  </div>
+</section>
+
 <main>
   <div class="grid" id="grid">
     <div class="state">
@@ -361,6 +458,7 @@
   let allBands   = [];
   let activeGenre = 'All';
   let searchTerm  = '';
+  let directoryTerm = '';
 
   // ── Fetch ──────────────────────────────────────────────────
   async function loadBands() {
@@ -369,6 +467,7 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       allBands = await res.json();
       buildGenreFilter();
+      renderDirectory();
       render();
     } catch (err) {
       document.getElementById('grid').innerHTML = `
@@ -377,7 +476,39 @@
           <h3>Could not load bands</h3>
           <p>${err.message}</p>
         </div>`;
+      document.getElementById('directory-list').innerHTML = `
+        <div class="directory-empty">Could not load bands list</div>
+      `;
+      document.getElementById('directory-count').textContent = '0 bands';
     }
+  }
+
+  // ── All bands directory ───────────────────────────────────
+  function renderDirectory() {
+    const term = directoryTerm.trim().toLowerCase();
+    const list = [...allBands]
+      .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+      .filter(b => !term || b.name?.toLowerCase().includes(term));
+
+    document.getElementById('directory-count').textContent = `${list.length} of ${allBands.length} bands`;
+
+    const container = document.getElementById('directory-list');
+    if (!list.length) {
+      container.innerHTML = '<div class="directory-empty">No bands match this filter</div>';
+      return;
+    }
+
+    container.innerHTML = list.map(b => `
+      <button class="directory-item" type="button" data-id="${b.id}" title="${escapeHtml(b.name || 'Unknown band')}">
+        ${escapeHtml(b.name || 'Unknown band')}
+      </button>
+    `).join('');
+
+    container.querySelectorAll('.directory-item').forEach(item => {
+      const open = () => openModal(item.dataset.id);
+      item.addEventListener('click', open);
+      item.addEventListener('keydown', e => e.key === 'Enter' && open());
+    });
   }
 
   // ── Genre filter ────────────────────────────────────────────
@@ -502,6 +633,11 @@
     }, 250);
   });
 
+  document.getElementById('all-bands-filter').addEventListener('input', e => {
+    directoryTerm = e.target.value;
+    renderDirectory();
+  });
+
   // ── Helpers ─────────────────────────────────────────────────
   function formatNum(n) {
     if (!n) return '0';
@@ -513,6 +649,15 @@
     el.className = 'card-img-placeholder';
     el.textContent = '🎵';
     return el;
+  }
+
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   // ── Init ─────────────────────────────────────────────────────
