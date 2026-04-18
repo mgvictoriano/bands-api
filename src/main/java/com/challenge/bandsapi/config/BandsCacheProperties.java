@@ -15,7 +15,5 @@ public record BandsCacheProperties(
 ) {
     public BandsCacheProperties {
         if (ttl == null) ttl = Duration.ofMinutes(10);
-        if (maximumSize <= 0) maximumSize = 500;
     }
 }
-
